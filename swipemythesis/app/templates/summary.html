@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'app/css/styles.css' %}">
+    <title>Preferences Summary</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Preferences Summary</h1>
+        <p>Here are the preferences you selected:</p>
+        <ul>
+            <li><strong>Reading Time:</strong> {{ reading_time }} minutes</li>
+            <li><strong>Difficulty Level:</strong> {{ difficulty_level }}</li>
+            <li><strong>Paper Recency:</strong> {{ paper_recency }}</li>
+            <li><strong>Research Interest:</strong> {{ research_interest }}</li>
+        </ul>
+
+        <!-- Form to submit preferences to the database when user clicks Start Swiping -->
+        <form action="{% url 'start_swiping' %}" method="POST">
+            {% csrf_token %}
+            <!-- Hidden fields to pass the preferences to the start_swiping view -->
+            <input type="hidden" name="reading_time" value="{{ reading_time }}">
+            <input type="hidden" name="difficulty_level" value="{{ difficulty_level }}">
+            <input type="hidden" name="paper_recency" value="{{ paper_recency }}">
+            <input type="hidden" name="research_interest" value="{{ research_interest }}">
+
+            <button type="submit" class="btn">Start Swiping</button>
+        </form>
+
+        <!-- Links to return to preferences or home -->
+        <a href="{% url 'preferences_page' %}" class="btn">Edit Preferences</a>
+        <a href="{% url 'landing_page' %}" class="btn">Return to Home</a>
+    </div>
+</body>
+</html>

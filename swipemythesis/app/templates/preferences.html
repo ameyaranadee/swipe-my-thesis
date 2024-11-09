@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'app/css/styles.css' %}">
+    <title>Select Your Preferences</title> 
+</head>
+<body>
+    <div class="container">
+        <h1>Select Your Paper Preferences</h1>
+        <form action="{% url 'submit_preferences' %}" method="POST">
+            {% csrf_token %}
+            <!-- Reading Time -->
+            <label for="reading_time">Reading Time:</label>
+            <select name="reading_time" id="reading_time" required>
+                {% for time in reading_times %}
+                <option value="{{ time }}">{{ time }} minutes</option>
+                {% endfor %}
+            </select>
+
+            <!-- Difficulty Level -->
+            <label for="difficulty_level">Difficulty Level:</label>
+            <select name="difficulty_level" id="difficulty_level" required>
+                <option value="undergraduate">Undergraduate</option>
+                <option value="graduate">Graduate</option>
+            </select>
+
+            <!-- Paper Recency -->
+            <label for="paper_recency">Paper Recency:</label>
+            <select name="paper_recency" id="paper_recency" required>
+                <option value="6 months">6 months</option>
+                <option value="1 year">1 year</option>
+                <option value="3 years">3 years</option>
+                <option value="5 years">5 years</option>
+                <option value="anytime">Anytime</option>
+            </select>
+
+            <!-- Research Interest -->
+            <label for="research_interest">Research Interest:</label>
+            <select name="research_interest" id="research_interest" required>
+                <option value="machine learning">Machine Learning</option>
+                <option value="nlp">NLP</option>
+                <option value="computer vision">Computer Vision</option>
+                <option value="finance">Finance</option>
+                <option value="sports">Sports</option>
+            </select>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn">Find Papers</button>
+        </form>
+    </div>
+</body>
+</html>

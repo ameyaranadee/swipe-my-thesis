@@ -21,4 +21,8 @@ from app import views
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", views.landing_page, name="landing_page"),
+    path('preferences/', views.preferences_page, name='preferences_page'),
+    path('submit_preferences/', views.submit_preferences, name='submit_preferences'),
+    path('start_swiping/', views.start_swiping, name='start_swiping'),  # Handle form submission
+    path('swipe_papers/', views.swipe_papers, name='swipe_papers'),  # Handle swipe papers page
 ]

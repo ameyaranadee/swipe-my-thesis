@@ -1,54 +1,52 @@
 from django.db import models
+from django.contrib.auth.models import User
 
-class ResearchTopic(models.Model):
-    name = models.CharField(max_length=200)
-
-    def __str__(self):
-        return self.name
-
-class Author(models.Model):
-    name = models.CharField(max_length=255)
+class ResearchInterest(models.Model):
+    name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.name
+
+class UserProfile(models.Model):
+    # user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    university = models.CharField(max_length=255)
+    major = models.CharField(max_length=100)
+    courses = models.TextField(help_text="Comma-separated list of courses")
+    research_interests = models.ManyToManyField(ResearchInterest, related_name="users")
+
+    def __str__(self):
+        return self.user.username
 
 class Paper(models.Model):
-    READING_TIME_CHOICES = [(i, f"{i} minutes") for i in range(15, 120, 15)]
-    DIFFICULTY_LEVEL_CHOICES = [
-        ('undergrad', 'Undergraduate'),
-        ('grad', 'Graduate')
-    ]
-    PAPER_RECENCY_CHOICES = [
-        ('6m', '6 months'),
-        ('1yr', '1 year'),
-        ('3yr', '3 years'),
-        ('any', 'Anytime'),
-    ]
-    name = models.CharField(max_length=30)
+    title = models.CharField(max_length=255, null=True)
+    abstract = models.TextField(null=True, blank=True)
+    published_date = models.DateField(null=True, blank=True)
+    authors = models.CharField(max_length=255, null=True)
     url = models.URLField()
-    authors = models.ManyToManyField(Author)
-    research_topic = models.ForeignKey(ResearchTopic, on_delete=models.CASCADE)
-    reading_time = models.IntegerField(choices=READING_TIME_CHOICES)
-    difficulty_level = models.CharField(max_length=10, choices=DIFFICULTY_LEVEL_CHOICES)
-    paper_recency = models.CharField(max_length=3, choices=PAPER_RECENCY_CHOICES)
+    research_interest = models.ForeignKey(ResearchInterest, on_delete=models.CASCADE, related_name="papers",null=True, blank=True)
 
     def __str__(self):
-        return self.name
-    
-class Course(models.Model):
-    course_code = models.CharField(max_length=100, unique=True, null=True)
-    name = models.CharField(max_length=255)
+        return self.title
+
+class UserPreference(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    reading_time = models.IntegerField(choices=[(i, f"{i} minutes") for i in range(15, 121, 15)])
+    difficulty_level = models.CharField(max_length=20, choices=[('undergraduate', 'Undergraduate'), ('graduate', 'Graduate')])
+    paper_recency = models.CharField(max_length=20, choices=[('6 months', '6 months'), ('1 year', '1 year'), ('3 years', '3 years'), ('5 years', '5 years'), ('anytime', 'Anytime')])
+    research_interest = models.ForeignKey(ResearchInterest, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.course_code} - {self.name}"
-    
-class User(models.Model):
-    name = models.CharField(max_length=100)
-    university = models.CharField(max_length=100)
-    major = models.CharField(max_length=100)
-    courses = models.ManyToManyField(Course, related_name='users')
-    papers_liked = models.ManyToManyField(Paper, related_name='liked_by', blank=True)
-    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+        return f"Preferences of {self.user.username}"
+
+class UserLikedPapers(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="liked_papers")
+    paper = models.ForeignKey(Paper, on_delete=models.CASCADE, related_name="liked_by_users")
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'paper')  # Ensure each paper can be liked only once per user
 
     def __str__(self):
-        return self.name
+        return f"{self.user.username} liked {self.paper.title}"
