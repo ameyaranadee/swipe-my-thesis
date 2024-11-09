@@ -2,6 +2,10 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from .models import UserPreference, ResearchInterest
 from django.contrib.auth.models import User
+from django.http import JsonResponse
+from .models import Paper
+from django.views.decorators.http import require_POST
+import random
 
 def landing_page(request):
     # return HttpResponse("<h1> Find hot papers in your area </h1>")
@@ -54,3 +58,40 @@ def start_swiping(request):
 
 def swipe_papers(request):
     return render(request, "swipe_papers.html")
+
+
+def paper_swipe_view(request):
+    return render(request, 'paper_swipe.html')
+
+def get_next_paper(request):
+    # Get a random paper
+    papers = list(Paper.objects.all())
+    print(papers)
+    if papers:
+        paper = random.choice(papers)
+
+        return JsonResponse({
+            'title': paper.title,
+            'content': paper.abstract
+        })
+    else:
+        return JsonResponse({'message': 'No more papers available'}, status=404)
+
+@require_POST
+def rate_paper(request):
+    paper_id = request.POST.get('paper_id')
+    rating = request.POST.get('rating')
+    
+    if not paper_id or not rating:
+        return JsonResponse({'status': 'error', 'message': 'Missing paper_id or rating'}, status=400)
+    
+    try:
+        paper = Paper.objects.get(id=paper_id)
+    except Paper.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Paper not found'}, status=404)
+    
+    # For now, just print the rating instead of saving it
+    print(f"Paper {paper_id} rated as {rating}")
+    
+    return JsonResponse({'status': 'success'})
+

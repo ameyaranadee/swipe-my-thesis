@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from app import views
+from . import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -25,4 +25,7 @@ urlpatterns = [
     path('submit_preferences/', views.submit_preferences, name='submit_preferences'),
     path('start_swiping/', views.start_swiping, name='start_swiping'),  # Handle form submission
     path('swipe_papers/', views.swipe_papers, name='swipe_papers'),  # Handle swipe papers page
+    path('paper-swipe/', views.paper_swipe_view, name='paper_swipe'),
+    path('api/get-next-paper/', views.get_next_paper, name='get_next_paper'),
+    path('api/rate-paper/', views.rate_paper, name='rate_paper'),
 ]
