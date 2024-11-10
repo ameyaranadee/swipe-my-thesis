@@ -27,6 +27,7 @@ class Paper(models.Model):
     authors = models.CharField(max_length=255, null=True)
     url = models.URLField()
     research_interest = models.ForeignKey(ResearchInterest, on_delete=models.CASCADE, related_name="papers",null=True, blank=True)
+    paper_summary = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.title

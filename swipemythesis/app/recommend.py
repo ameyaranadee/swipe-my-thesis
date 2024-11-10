@@ -9,7 +9,6 @@ from transformers import pipeline
 # import transformers
 from .models import Paper, ResearchInterest
 from celery import shared_task
-from celery import shared_task
 
 
 def load_model():
@@ -114,13 +113,13 @@ def search_arxiv_and_parse(classifier, query="machine learning", max_results=5, 
         today = datetime.today()
         difference = (today - published).days
         if difference < timespan:
-            print(difference)
+            # print(difference)
             try:
                 text = return_text(link)
         
             except:
                 continue
-            if len(text) <= 0:
+            if len(text) == 0:
                 continue
             difficulty = difficulty_level(classifier, text)
             print(difficulty)
@@ -145,7 +144,7 @@ def search_arxiv_and_parse(classifier, query="machine learning", max_results=5, 
                     for paper in sorted_data:
                         print("Query: ", query)
                         researchInterest = ResearchInterest.objects.get(name=query)
-                        Paper.objects.create(title=paper['Title'], abstract=paper['Summary'], published_date=paper['Published Date'], url=paper['Link'], research_interest=researchInterest)
+                        Paper.objects.update_or_create(title=paper['Title'], abstract=paper['Summary'], published_date=paper['Published Date'], url=paper['Link'], research_interest=researchInterest)
                         print("populated")
         else:
             break

@@ -13,6 +13,7 @@ from .models import UserProfile, ResearchInterest, UserLikedPapers, UserPreferen
 import random
 import threading
 from app.recommend import load_model, search_arxiv_and_parse, call_main_function
+from app.summarize import call_summarize_main_function
 
 
 
@@ -135,9 +136,16 @@ def start_swiping(request):
 def swipe_papers(request):
     return render(request, "swipe_papers.html")
 
-
 def paper_swipe_view(request):
-    call_main_function.delay()
+    reading_time = request.GET.get('reading_time')
+    difficulty_level = request.GET.get('difficulty_level')
+    paper_recency = request.GET.get('paper_recency')
+    research_interest = request.GET.get('research_interest')
+
+    if difficulty_level == 'Undergradaute': diff_lv = 'Basic' 
+    else: diff_lv = 'Advanced'
+
+    call_main_function.delay(query=research_interest, target_reading=reading_time, diff_lv=diff_lv)
     return render(request, 'paper_swipe.html')
 
 def get_next_paper(request):
@@ -157,15 +165,16 @@ def get_next_paper(request):
 def rate_paper(request):
     paper_title = request.POST.get('paper_title')
     rating = request.POST.get('rating')
-    
+    user=request.user
     if not paper_title or not rating:
         return JsonResponse({'status': 'error', 'message': 'Missing paper_id or rating'}, status=400)
     
     try:
         papertitle = Paper.objects.get(title=paper_title)
         if papertitle and rating=='like':
-            paper = UserLikedPapers.objects.create(user="xxx", paper=papertitle)
-            return JsonResponse({'status': 'success', 'title': paper.title})
+            paper = UserLikedPapers.objects.create(user=user, paper=papertitle)
+            call_summarize_main_function.delay(paper_title, papertitle.url)
+            return JsonResponse({'status': 'success'})
 
     except Paper.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': 'Paper not found'}, status=404)
@@ -175,6 +184,27 @@ def rate_paper(request):
     
     return JsonResponse({'status': 'success'})
 
+def start_swiping(request):
+    reading_time = request.POST.get('reading_time')
+    difficulty_level = request.POST.get('difficulty_level')
+    paper_recency = request.POST.get('paper_recency')
+    research_interest_name = request.POST.get('research_interest')
+
+    research_interest, created = ResearchInterest.objects.get_or_create(name=research_interest_name)
+
+    user_preference = UserPreference.objects.get_or_create(
+        user=request.user,
+        reading_time=reading_time,
+        difficulty_level=difficulty_level,
+        paper_recency=paper_recency,
+        research_interest=research_interest
+    )
+
+    url = reverse('paper_swipe')
+    query_string = f"?reading_time={reading_time}&difficulty_level={difficulty_level}&paper_recency={paper_recency}&research_interest={research_interest_name}"
+    full_url = f"{url}{query_string}"
+
+    return redirect(full_url)
 
 def profile_view(request):
     user=request.user
