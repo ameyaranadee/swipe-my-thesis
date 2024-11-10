@@ -1,0 +1,225 @@
+/* Core variables */
+:root {
+    --primary-blue: #2185d0;
+    --secondary-blue: #1678c2;
+    --accent-color: #ff9f1c;
+    --dark-bg: #1a1b1e;
+    --card-bg: #ffffff;
+}
+
+/* Form specific styles */
+.custom-card {
+    background: var(--card-bg);
+    border: none !important;
+    border-radius: 20px !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2) !important;
+    width: 100%;
+    max-width: 500px;
+    padding: 2.5rem !important;
+    transform: translateY(20px);
+    opacity: 0;
+    animation: slideUp 0.6s ease forwards;
+    position: relative;
+    overflow: hidden;
+    margin: 2rem auto;
+}
+
+.custom-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-blue), var(--accent-color), var(--primary-blue));
+    background-size: 200% 100%;
+    animation: shimmer 3s infinite linear;
+}
+
+/* Animation keyframes */
+@keyframes shimmer {
+    0% { background-position: 100% 0; }
+    100% { background-position: -100% 0; }
+}
+
+@keyframes slideUp {
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Form group styling */
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+.form-group label {
+    display: none;
+}
+
+/* Input fields styling */
+.form-group input:not([type="file"]), 
+.form-group textarea {
+    width: 100%;
+    padding: 1rem 1.2rem;
+    border: 2px solid #eef1f5;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: #f8fafc;
+    box-sizing: border-box;
+    margin-bottom: 0.5rem;
+}
+
+.form-group input:focus, 
+.form-group textarea:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(33, 133, 208, 0.1);
+    outline: none;
+    transform: translateY(-2px);
+    background-color: white;
+}
+
+/* Textarea specific styles */
+.form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* File upload styling */
+.form-group input[type="file"] {
+    width: 100%;
+    padding: 1.5rem;
+    background-color: #f8fafc;
+    border: 2px dashed #eef1f5;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.form-group input[type="file"]:hover {
+    border-color: var(--primary-blue);
+    background-color: rgba(33, 133, 208, 0.05);
+}
+
+/* Register button styling */
+.btn-register {
+    background: linear-gradient(45deg, var(--primary-blue), var(--secondary-blue)) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    color: white !important;
+    padding: 1rem !important;
+    font-size: 1rem !important;
+    font-weight: 500 !important;
+    width: 100% !important;
+    margin-top: 1rem !important;
+    transition: all 0.3s ease !important;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+}
+
+.btn-register:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(33, 133, 208, 0.3) !important;
+}
+
+.btn-register:active {
+    transform: translateY(0);
+}
+
+.btn-register::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: 0.5s;
+}
+
+.btn-register:hover::before {
+    left: 100%;
+}
+
+/* Error message styling */
+.errorlist {
+    color: #dc3545;
+    font-size: 0.875em;
+    list-style: none;
+    padding: 0;
+    margin-top: 0.25rem;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Login link styling */
+.text-center.mt-3 {
+    margin-top: 1.5rem !important;
+    color: #64748b;
+    opacity: 0;
+    animation: fadeIn 0.6s ease 0.9s forwards;
+}
+
+.text-center.mt-3 a {
+    color: var(--primary-blue);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    position: relative;
+}
+
+.text-center.mt-3 a::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: var(--primary-blue);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+}
+
+.text-center.mt-3 a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+/* Typeahead styling */
+.twitter-typeahead {
+    width: 100%;
+}
+
+.tt-menu {
+    width: 100%;
+    margin-top: 0.5rem;
+    padding: 0.5rem 0;
+    background-color: white;
+    border: 1px solid #eef1f5;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.tt-suggestion {
+    padding: 0.75rem 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tt-suggestion:hover {
+    background-color: #f8fafc;
+    color: var(--primary-blue);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .custom-card {
+        margin: 1rem;
+        padding: 1.5rem !important;
+    }
+}

@@ -1,12 +1,85 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from .models import UserPreference, ResearchInterest
-from django.contrib.auth.models import User
-from django.http import JsonResponse
-from .models import Paper
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.decorators import login_required
+from .forms import CustomUserCreationForm
 from django.views.decorators.http import require_POST
+from .models import UserProfile, ResearchInterest, UserLikedPapers
+from django.contrib.auth.models import User
 import random
 
+
+
+def user_login(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('landing_page')  # Redirect to landing page after login
+    # If authentication failed (e.g. Guest user login)
+            else:
+                # Check if the username is 'Guest'
+                if username == 'Guest':
+                    user, created = User.objects.get_or_create(username='Guest')
+                    # Optionally set a random password if you want to allow guest users to log in
+                    if created:
+                        user.set_password('guestpassword123')  # Set a default password
+                        user.save()
+                    login(request, user)
+                    return redirect('landing_page')  # Redirect to landing page
+    else:
+        form = AuthenticationForm()
+    return render(request, 'app/login.html', {'form': form})
+
+# def register(request):
+#     if request.method == 'POST':
+#         form = CustomUserCreationForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('login')
+#     else:
+#         form = CustomUserCreationForm()
+#     return render(request, 'app/register.html', {'form': form})
+
+def register(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST, request.FILES)  # Ensure form handles file uploads
+        if form.is_valid():
+            # Save the User (this will create the User instance)
+            user = form.save()
+            login(request, user)
+            # # Create and save UserProfile with additional user information
+            # user_profile = UserProfile(
+            #     user=user,
+            #     profile_picture=form.cleaned_data.get('profile_picture'),
+            #     university=form.cleaned_data.get('university'),
+            #     major=form.cleaned_data.get('major'),
+            #     courses=form.cleaned_data.get('courses')
+            # )
+            # user_profile.save()
+
+            # Handle research interests
+            # research_interests = form.cleaned_data.get('research_interests')
+            # if research_interests:
+            #     # Assuming 'research_interests' is a comma-separated list of interests
+            #     research_interests_list = research_interests.split(',')  # Split if input is comma-separated
+            #     for interest in research_interests_list:
+            #         # If the interest doesn't exist, create it
+            #         interest_obj, created = ResearchInterest.objects.get_or_create(name=interest.strip())
+            #         user_profile.research_interests.add(interest_obj)
+
+            return redirect('login')  # Redirect to login after successful registration
+    else:
+        form = CustomUserCreationForm()
+
+    return render(request, 'app/register.html', {'form': form})
+
+@login_required
 def landing_page(request):
     # return HttpResponse("<h1> Find hot papers in your area </h1>")
     return render(request, "index.html")

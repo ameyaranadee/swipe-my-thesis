@@ -16,11 +16,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from . import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", views.landing_page, name="landing_page"),
+    path("", views.user_login, name="login"),  # Set login as the landing page
+    path("register/", views.register, name="register"),
+    path("landing/", views.landing_page, name="landing_page"),  # Landing page route
     path('preferences/', views.preferences_page, name='preferences_page'),
     path('submit_preferences/', views.submit_preferences, name='submit_preferences'),
     path('start_swiping/', views.start_swiping, name='start_swiping'),  # Handle form submission
@@ -28,4 +32,4 @@ urlpatterns = [
     path('paper-swipe/', views.paper_swipe_view, name='paper_swipe'),
     path('api/get-next-paper/', views.get_next_paper, name='get_next_paper'),
     path('api/rate-paper/', views.rate_paper, name='rate_paper'),
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

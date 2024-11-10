@@ -9,7 +9,8 @@ class ResearchInterest(models.Model):
 
 class UserProfile(models.Model):
     # user = models.OneToOneField(User, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    # password= models
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     university = models.CharField(max_length=255)
     major = models.CharField(max_length=100)
