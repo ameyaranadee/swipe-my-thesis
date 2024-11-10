@@ -32,10 +32,10 @@ class Paper(models.Model):
         return self.title
 
 class UserPreference(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     reading_time = models.IntegerField(choices=[(i, f"{i} minutes") for i in range(15, 121, 15)])
-    difficulty_level = models.CharField(max_length=20, choices=[('undergraduate', 'Undergraduate'), ('graduate', 'Graduate')])
-    paper_recency = models.CharField(max_length=20, choices=[('6 months', '6 months'), ('1 year', '1 year'), ('3 years', '3 years'), ('5 years', '5 years'), ('anytime', 'Anytime')])
+    difficulty_level = models.CharField(max_length=20)
+    paper_recency = models.CharField(max_length=20)
     research_interest = models.ForeignKey(ResearchInterest, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):

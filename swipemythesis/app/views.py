@@ -5,7 +5,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from .forms import CustomUserCreationForm
 from django.views.decorators.http import require_POST
-from .models import UserProfile, ResearchInterest, UserLikedPapers
+from .models import UserProfile, ResearchInterest, UserLikedPapers, UserPreference
 from django.contrib.auth.models import User
 import random
 
@@ -94,7 +94,7 @@ def submit_preferences(request):
         reading_time = request.POST.get('reading_time')
         difficulty_level = request.POST.get('difficulty_level')
         paper_recency = request.POST.get('paper_recency')
-        research_interest = request.POST.get('research_interest')
+        research_interest = request.POST.get('research_interests')
 
         context = {
             'reading_time': reading_time,
@@ -108,7 +108,7 @@ def submit_preferences(request):
     return redirect('landing_page')
 
 def start_swiping(request):
-    # Capture the preferences and save them to the database
+    user=request.user
     reading_time = request.POST.get('reading_time')
     difficulty_level = request.POST.get('difficulty_level')
     paper_recency = request.POST.get('paper_recency')
@@ -116,9 +116,7 @@ def start_swiping(request):
 
     research_interest, created = ResearchInterest.objects.get_or_create(name=research_interest_name)
 
-    user, created = User.objects.get_or_create(username="Guest")
-
-    user_preference = UserPreference.objects.create(
+    user_preference = UserPreference.objects.get_or_create(
         user=user,
         reading_time=reading_time,
         difficulty_level=difficulty_level,
@@ -126,7 +124,6 @@ def start_swiping(request):
         research_interest=research_interest
     )
 
-    # Redirect to start swiping
     return redirect('swipe_papers') 
 
 def swipe_papers(request):
