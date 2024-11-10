@@ -123,14 +123,14 @@ def start_swiping(request):
     research_interest, created = ResearchInterest.objects.get_or_create(name=research_interest_name)
 
     user_preference = UserPreference.objects.get_or_create(
-        user=user,
+        user=request.user,
         reading_time=reading_time,
         difficulty_level=difficulty_level,
         paper_recency=paper_recency,
         research_interest=research_interest
     )
 
-    return redirect('swipe_papers') 
+    return redirect('paper_swipe') 
 
 def swipe_papers(request):
     return render(request, "swipe_papers.html")
