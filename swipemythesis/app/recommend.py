@@ -72,7 +72,7 @@ def call_main_function():
     classifier=load_model()
     search_arxiv_and_parse(classifier)
 
-def search_arxiv_and_parse(classifier, query="machine learning", max_results=50, timespan=1000000, target_reading=120, diff_lv='Basic'):
+def search_arxiv_and_parse(classifier, query="machine learning", max_results=5, timespan=1000000, target_reading=120, diff_lv='Basic'):
     base_url = "http://export.arxiv.org/api/query"
     params = {
         "search_query": query,

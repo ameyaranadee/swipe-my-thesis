@@ -5,10 +5,14 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from .forms import CustomUserCreationForm
+from .models import UserPreference, ResearchInterest
+from django.contrib.auth.models import User
+from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from .models import UserProfile, ResearchInterest, UserLikedPapers, UserPreference, Paper
-from django.contrib.auth.models import User
 import random
+import threading
+from app.recommend import load_model, search_arxiv_and_parse, call_main_function
 
 
 
@@ -109,7 +113,8 @@ def submit_preferences(request):
     return redirect('landing_page')
 
 def start_swiping(request):
-    user=request.user
+    # Capture the preferences and save them to the database
+    
     reading_time = request.POST.get('reading_time')
     difficulty_level = request.POST.get('difficulty_level')
     paper_recency = request.POST.get('paper_recency')
@@ -132,6 +137,7 @@ def swipe_papers(request):
 
 
 def paper_swipe_view(request):
+    call_main_function.delay()
     return render(request, 'paper_swipe.html')
 
 def get_next_paper(request):
@@ -149,19 +155,23 @@ def get_next_paper(request):
 
 @require_POST
 def rate_paper(request):
-    paper_id = request.POST.get('paper_id')
+    paper_title = request.POST.get('paper_title')
     rating = request.POST.get('rating')
     
-    if not paper_id or not rating:
+    if not paper_title or not rating:
         return JsonResponse({'status': 'error', 'message': 'Missing paper_id or rating'}, status=400)
     
     try:
-        paper = Paper.objects.get(id=paper_id)
+        papertitle = Paper.objects.get(title=paper_title)
+        if papertitle and rating=='like':
+            paper = UserLikedPapers.objects.create(user="xxx", paper=papertitle)
+            return JsonResponse({'status': 'success', 'title': paper.title})
+
     except Paper.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': 'Paper not found'}, status=404)
     
     # For now, just print the rating instead of saving it
-    print(f"Paper {paper_id} rated as {rating}")
+    print(f"{paper_title} rated as {rating}")
     
     return JsonResponse({'status': 'success'})
 

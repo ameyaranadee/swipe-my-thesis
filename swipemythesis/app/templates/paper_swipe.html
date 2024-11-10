@@ -202,7 +202,7 @@
     
             } else if (propX < -0.25 && e.direction == Hammer.DIRECTION_LEFT) {
     
-                successful = true
+                successful = trueresearch_interest
                 // get left border position
                 posX = -(this.board.clientWidth + this.topCard.clientWidth)
     
@@ -218,7 +218,7 @@
                     const rating = (e.direction == Hammer.DIRECTION_RIGHT) ? 'like' : 'dislike'
     
                     // Send rating to the backend
-                    this.ratePaper(this.papers[this.currentIndex].id, rating)
+                    this.ratePaper(this.papers[this.currentIndex].title, rating)
     
                     // Throw card in the chosen direction
                     this.topCard.style.transform =
@@ -248,7 +248,7 @@
     
             }
     
-            async ratePaper(paperId, rating) {
+            async ratePaper(papertitle, rating) {
                 try {
                     const response = await fetch('/api/rate-paper/', {
                         method: 'POST',
@@ -256,7 +256,7 @@
                             'Content-Type': 'application/x-www-form-urlencoded',
                             'X-CSRFToken': this.getCookie('csrftoken')
                         },
-                        body: `paper_id=${paperId}&rating=${rating}`
+                        body: `paper_title=${papertitle}&rating=${rating}`
                     })
                     const data = await response.json()
                     if (data.status !== 'success') {
