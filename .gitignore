@@ -1,7 +1,4 @@
 hackumass-env/
-<<<<<<< Updated upstream
 db.sqlite3
 venv
-=======
 .DS_store
->>>>>>> Stashed changes
