@@ -1,0 +1,37 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Course Partners</title>
+    <link rel="stylesheet" href="{% static 'app/css/partner.css' %}">
+</head>
+<body>
+    <!-- Loader -->
+    <div class="loader-container">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Content -->
+    <div class="content" id="content" style="display: none;">
+        <h1>Your Potential Research Partners</h1>
+        
+        {% for partner in partners %}
+        <div class="profile-info">
+            <div class="profile-pic">
+                <img src="{{ partner.profile_picture }}" alt="{{ partner.name }}">
+            </div>
+            <div class="profile-details">
+                <p><strong>Name:</strong> {{ partner.name }}</p>
+                <p><strong>Email:</strong> {{ partner.email }}</p>
+                <p><strong>University:</strong> {{ partner.university }}</p>
+                <p><strong>Major:</strong> {{ partner.major }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script src="{% static 'app/js/partner.js' %}"></script>
+</body>
+</html>

@@ -54,17 +54,18 @@ document.querySelectorAll('.interest-btn').forEach(btn => {
 document.addEventListener("DOMContentLoaded", function() {
     const difficultySlider = document.getElementById('difficulty_level');
     const difficultyLevelHiddenInput = document.getElementById('difficulty_level_hidden');
+    const difficultyLevelLabel = document.querySelector('.difficulty-labels');
 
-    if (difficultySlider && difficultyLevelHiddenInput) { // Check if elements exist
+    if (difficultySlider && difficultyLevelHiddenInput) {
         difficultySlider.addEventListener('input', function() {
             const value = parseInt(difficultySlider.value);
-            const difficultyText = value <= 50 ? 'Undergraduate' : 'Graduate';
+            const difficultyText = value <= 50 ? 'Basic' : 'Advanced';
             difficultyLevelHiddenInput.value = difficultyText;
             difficultyLevelHiddenInput.textContent = difficultyText;
 
-            // Update labels for visual feedback
+            // Update labels for visual feedback                                          
             difficultyLevelLabel.querySelectorAll('span').forEach((label, index) => {
-                label.style.fontWeight = index === (difficultyText === 'Undergraduate' ? 0 : 1) ? 'bold' : 'normal';
+                label.style.fontWeight = index === (difficultyText === 'Basic' ? 0 : 1) ? 'bold' : 'normal';
             });
         });
     }

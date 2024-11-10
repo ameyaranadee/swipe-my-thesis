@@ -67,11 +67,11 @@ def find_sorted_closest_indexes(target, numbers):
     return sorted_indexes 
   
 @shared_task
-def call_main_function():
+def call_main_function(research_interest, reading_time, paper_recency, difficulty_level):
     classifier=load_model()
-    search_arxiv_and_parse(classifier)
+    search_arxiv_and_parse(classifier, query=research_interest, target_reading=reading_time, timespan=paper_recency, diff_lv=difficulty_level)
 
-def search_arxiv_and_parse(classifier, query="machine learning", max_results=5, timespan=1000000, target_reading=120, diff_lv='Basic'):
+def search_arxiv_and_parse(classifier, query="machine learning", max_results=50, timespan=1000000, target_reading=120, diff_lv='Basic'):
     base_url = "http://export.arxiv.org/api/query"
     params = {
         "search_query": query,
@@ -116,13 +116,12 @@ def search_arxiv_and_parse(classifier, query="machine learning", max_results=5, 
             # print(difference)
             try:
                 text = return_text(link)
-        
             except:
                 continue
-            if len(text) == 0:
+            if text is None:
                 continue
             difficulty = difficulty_level(classifier, text)
-            print(difficulty)
+            print('gg', difficulty[0], diff_lv.lower())
             if diff_lv.lower() in difficulty[0]:
                 read_time = approximate_reading_time(text, difficulty)
                 reading_times.append(read_time)
@@ -135,7 +134,7 @@ def search_arxiv_and_parse(classifier, query="machine learning", max_results=5, 
                 })
                 print("After append: ", data_new)
                 count += 1
-                if count >= 1:
+                if count >= 2:
                     sorted_indexes = find_sorted_closest_indexes(target_reading, reading_times)
                     count = 0
                     reading_times=[]
@@ -146,6 +145,7 @@ def search_arxiv_and_parse(classifier, query="machine learning", max_results=5, 
                         researchInterest = ResearchInterest.objects.get(name=query)
                         Paper.objects.update_or_create(title=paper['Title'], abstract=paper['Summary'], published_date=paper['Published Date'], url=paper['Link'], research_interest=researchInterest)
                         print("populated")
+                    data_new = []
         else:
             break
 

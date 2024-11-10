@@ -8,71 +8,9 @@
     <title>Select Your Preferences</title> 
 </head>
 <body>
-    <!-- <div class="container">
-        <h1>Select Your Paper Preferences</h1>
-        <form action="{% url 'submit_preferences' %}" method="POST" id="preferencesForm">
-            {% csrf_token %}
-            
-            Progress Dots
-            <div class="progress-dots">
-                <div class="dot active"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
-            </div>
-
-            Reading Time Step
-            <div class="form-step active" data-step="1">
-                <h2>Reading Time</h2>
-                <select name="reading_time" id="reading_time" required>
-                    {% for time in reading_times %}
-                    <option value="{{ time }}">{{ time }} minutes</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            Difficulty Level Step
-            <div class="form-step" data-step="2">
-                <h2>Difficulty Level</h2>
-                <select name="difficulty_level" id="difficulty_level" required>
-                    <option value="undergraduate">Undergraduate</option>
-                    <option value="graduate">Graduate</option>
-                </select>
-            </div>
-
-            Paper Recency Step
-            <div class="form-step" data-step="3">
-                <h2>Paper Recency</h2>
-                <select name="paper_recency" id="paper_recency" required>
-                    <option value="6 months">6 months</option>
-                    <option value="1 year">1 year</option>
-                    <option value="3 years">3 years</option>
-                    <option value="5 years">5 years</option>
-                    <option value="anytime">Anytime</option>
-                </select>
-            </div>
-
-            Research Interest Step
-            <div class="form-step" data-step="4">
-                <h2>Research Interest</h2>
-                <select name="research_interest" id="research_interest" required>
-                    <option value="machine learning">Machine Learning</option>
-                    <option value="nlp">NLP</option>
-                    <option value="computer vision">Computer Vision</option>
-                    <option value="finance">Finance</option>
-                    <option value="sports">Sports</option>
-                </select>
-            </div>
-
-            <div class="form-navigation">
-                <button type="button" class="btn" id="prevBtn" style="display: none;">Previous</button>
-                <button type="button" class="btn" id="nextBtn">Next</button>
-            </div>
-        </form>
-    </div> -->
     <div class="container">
         <div class="header">
-            <h1>Find hot papers in your area <span class="fire-emoji">🔥</span></h1>
+            <h1>Find hot papers in your research area <span class="fire-emoji">🔥</span></h1>
             <div class="hot-papers">
                 <i> Read a research paper everyday anon.</i>
             </div>
@@ -103,15 +41,12 @@
             <div class="form-step" data-step="2">
                 <h2>Difficulty Level</h2>
                 <div class="difficulty-slider">
-                    <!-- <input type="range" min="0" max="100" value="50" 
-                           class="slider" id="difficulty_level" name="difficulty_level"> -->
-                    <!-- <input type="hidden" name="difficulty_level" id="difficulty_level_hidden" value="Undergrad"> -->
                     <input type="range" id="difficulty_level" name="difficulty_level" min="0" max="100">
-                    <input type="hidden" name="difficulty_level" id="difficulty_level_hidden" value="Undergrad">                    
+                    <input type="hidden" name="difficulty_level" id="difficulty_level_hidden" value="Basic">                    
                 </div>
                 <div class="difficulty-labels">
-                    <span>Undergrad</span>
-                    <span>Grad</span>
+                    <span>Basic</span>
+                    <span>Advanced</span>
                 </div>
             </div>
 
@@ -119,10 +54,10 @@
             <div class="form-step" data-step="3">
                 <h2>Paper Recency</h2>
                 <div class="recency-options">
-                    <button type="button" class="interest-btn" data-value="3months">3 months</button>
-                    <button type="button" class="interest-btn" data-value="6months">6 months</button>
-                    <button type="button" class="interest-btn" data-value="1year">1 year</button>
-                    <button type="button" class="interest-btn" data-value="anytime">Anytime</button>
+                    <button type="button" class="interest-btn" data-value=180>3 months</button>
+                    <button type="button" class="interest-btn" data-value=365>1 year</button>
+                    <button type="button" class="interest-btn" data-value=1825>5 years</button>
+                    <button type="button" class="interest-btn" data-value=1000000>Anytime</button>
                 </div>
                 <input type="hidden" name="paper_recency" id="paper_recency" required>
             </div>
@@ -131,15 +66,15 @@
             <div class="form-step" data-step="4">
                 <h2>Research Interests</h2>
                 <div class="research-interests">
-                    <button type="button" class="interest-btn" data-value="ml">ML</button>
-                    <button type="button" class="interest-btn" data-value="dl">DL</button>
-                    <button type="button" class="interest-btn" data-value="nlp">NLP</button>
-                    <button type="button" class="interest-btn" data-value="finance">Finance</button>
-                    <button type="button" class="interest-btn" data-value="sports">Sports</button>
-                    <button type="button" class="interest-btn" data-value="cv">CV</button>
-                    <button type="button" class="interest-btn" data-value="llm">LLM</button>
-                    <button type="button" class="interest-btn" data-value="systems">Systems</button>
-                    <button type="button" class="interest-btn" data-value="security">Security</button>
+                    <button type="button" class="interest-btn" data-value="Machine learning">Machine Learning</button>
+                    <button type="button" class="interest-btn" data-value="Deep Learning">Deep Learning</button>
+                    <button type="button" class="interest-btn" data-value="Natural Language Processing">NLP</button>
+                    <button type="button" class="interest-btn" data-value="Finance">Finance</button>
+                    <button type="button" class="interest-btn" data-value="Sports">Sports</button>
+                    <button type="button" class="interest-btn" data-value="Computer Vision">CV</button>
+                    <button type="button" class="interest-btn" data-value="Large Language Models">LLMs</button>
+                    <button type="button" class="interest-btn" data-value="Systems">Systems</button>
+                    <button type="button" class="interest-btn" data-value="Security">Security</button>
                 </div>
                 <input type="hidden" name="research_interests" id="research_interests" required>
             </div>

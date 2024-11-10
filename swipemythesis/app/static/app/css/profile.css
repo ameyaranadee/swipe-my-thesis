@@ -1,15 +1,18 @@
 :root {
-    --blue: rgba(37, 150, 190, 1);
-    --blue-light: rgba(37, 150, 190, 0.2);
-    --text-color: #333;
-    --background-color: #f9f9f9;
-    --shadow-color: rgba(0, 0, 0, 0.1);
+    --blue: rgb(37, 150, 190); /* Vibrant blue for accents */
+    --blue-light: rgb(98, 187, 219); /* Slightly lighter blue for hover effects */
+    --text-color: #e2e8f0; /* Light gray for text */
+    --background-color: #121212; /* Deep dark gray for the background */
+    --card-background: #1e1e1e; /* Slightly lighter gray for cards */
+    --tag-background: #2a2a2a; /* Mid-gray for tags */
+    --shadow-color: rgba(0, 0, 0, 0.6); /* Subtle shadow for depth */
+    --hover-color: rgb(101, 183, 213); /* Blue for hover */
 }
 
 body {
     background-color: var(--background-color);
     color: var(--text-color);
-    font-family: Arial, sans-serif;
+    font-family: 'Roboto', Arial, sans-serif;
     margin: 0;
     padding: 0;
 }
@@ -22,8 +25,10 @@ body {
 
 h1 {
     color: var(--blue);
-    font-size: 24px;
+    font-size: 28px;
+    font-weight: bold;
     margin-bottom: 20px;
+    text-align: center;
 }
 
 .profile-info {
@@ -31,17 +36,27 @@ h1 {
     align-items: center;
     gap: 20px;
     margin-bottom: 20px;
+    padding: 15px;
+    background-color: var(--card-background);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px var(--shadow-color);
 }
 
 .profile-pic img {
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
-    border: 2px solid var(--blue);
+    border: 3px solid var(--blue);
 }
 
 .profile-details p {
     margin: 5px 0;
+    font-size: 16px;
+}
+
+.profile-details p span {
+    font-weight: bold;
+    color: var(--blue);
 }
 
 /* Interests Section */
@@ -53,6 +68,8 @@ h1 {
     font-weight: bold;
     color: var(--blue);
     font-size: 18px;
+    margin-bottom: 10px;
+    display: block;
 }
 
 .tags {
@@ -63,11 +80,17 @@ h1 {
 
 .tag {
     padding: 8px 12px;
-    background-color: var(--blue-light);
-    color: rgba(37, 150, 190, 0.9);
+    background-color: var(--tag-background);
+    color: var(--text-color);
     border-radius: 15px;
     font-size: 14px;
     font-weight: 500;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.tag:hover {
+    background-color: var(--hover-color);
+    color: #fff;
 }
 
 /* Topics List Section */
@@ -76,7 +99,7 @@ h1 {
 }
 
 .topic-card {
-    background-color: #fff;
+    background-color: var(--card-background);
     padding: 15px;
     border-radius: 10px;
     box-shadow: 0 4px 8px var(--shadow-color);
@@ -87,7 +110,7 @@ h1 {
 
 .topic-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px var(--shadow-color);
+    box-shadow: 0 6px 12px var(--hover-color);
 }
 
 .topic-card h3 {
@@ -121,40 +144,201 @@ h1 {
 
 .paper-divider {
     border: none;
-    border-top: 1px solid var(--blue-light);
-    margin: 10px 0;
+    border-top: 1px solid var(--tag-background);
+    margin: 15px 0;
 }
+
 .paper-item {
-    margin-bottom: 15px; /* Add spacing between items */
+    margin-bottom: 15px;
 }
 
 .paper-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 5px; /* Space between title and description */
+    margin-bottom: 5px;
 }
 
 .paper-title {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: bold;
     color: var(--text-color);
     margin: 0;
 }
-
-/* .paper-icons {
+.paper-icons{
+    display: flex;
     gap: 10px;
-    font-size: 16px;
-} */
+    align-items: center;
+}
 
 .icon {
     width: 24px;
     height: 24px;
     color: var(--blue);
+    cursor: pointer;
+    transition: color 0.3s ease;
 }
 
-.paper-icons{
-    display: flex;
-    gap: 10px;
-    align-items: center;
+.icon:hover {
+    color: var(--hover-color);
+}
+
+.like-icon.liked svg {
+    fill: red;
+}
+
+.paper-description {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #d1d5db; /* Slightly lighter gray for descriptions */
+}
+
+/* Add extra spacing and alignment for readability */
+.courses, .interests {
+    margin-bottom: 20px;
+}
+
+label {
+    font-size: 16px;
+    color: var(--blue);
+}
+
+
+/* sidebar */
+/* Sidebar */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -250px; /* Fully hidden when collapsed */
+    width: 250px;
+    height: 100%;
+    background-color: #1e1e1e; /* Dark background for sidebar */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    transition: transform 0.3s ease-in-out, left 0.3s ease-in-out; /* Smooth transition */
+    z-index: 1000;
+    overflow-y: auto;
+    visibility: hidden; /* Sidebar is not visible */
+}
+
+.sidebar.open {
+    left: 0; /* Sidebar is fully visible */
+    visibility: visible; /* Make it visible when open */
+}
+
+.new-topic-btn {
+    display: block;
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background-color: #4a90e2;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.new-topic-btn:hover {
+    background-color: #3578cc; /* Slightly darker blue on hover */
+}
+
+.topics-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.topic-item {
+    padding: 10px;
+    margin: 5px 0;
+    color: #e2e8f0; /* Light text */
+    background-color: #2a2a2a; /* Slightly lighter background for items */
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.topic-item:hover {
+    background-color: #4a90e2; /* Blue on hover */
+    color: white;
+}
+
+/* Menu Button */
+.menu-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.menu-icon {
+    width: 30px;
+    height: 30px;
+    color: white;
+}
+
+.partners-btn {
+    display: block;
+    margin: 0 auto 20px; /* Center the button and add spacing */
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background-color: var(--blue);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.partners-btn:hover {
+    background-color: var(--hover-color); /* Slightly lighter blue on hover */
+}
+
+
+/* Modal styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000; /* Above all other elements */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5); /* Black with opacity */
+}
+
+.modal-content {
+    background-color: var(--card-background);
+    margin: 10% auto; /* Center the modal */
+    padding: 20px;
+    border: 1px solid var(--blue);
+    border-radius: 10px;
+    width: 60%; /* Set modal width */
+    color: var(--text-color);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+}
+
+.close-btn {
+    color: var(--text-color);
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-btn:hover {
+    color: var(--blue);
+}
+
+h2 {
+    color: var(--blue);
 }

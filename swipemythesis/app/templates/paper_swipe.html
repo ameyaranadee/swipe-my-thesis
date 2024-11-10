@@ -12,9 +12,10 @@
             height: 100%;
             margin: 0;
             padding: 0;
+            background-color: #ffffffdd;
         }
 
-        #board {
+        /* #board {
             width: 100%;
             height: 100%;
             position: relative;
@@ -32,11 +33,168 @@
             box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.1);
             background-color: white;
             transform: translateX(-50%) translateY(-50%) scale(0.95);
-        }
+        } */
+        .board {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.card {
+    position: absolute;
+    padding: 15px;
+    width: 100%;
+    max-width: 400px;
+    height: 600px;
+    background: #1e1e1e;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+    cursor: grab;
+    user-select: none;
+    
+}
+.card:hover{
+    box-shadow: 0 6px 12px rgb(101,183,213);
+}
+.card.like {
+    border: 2px solid #4CAF50;
+}
+
+.card.nope {
+    border: 2px solid #FF5252;
+}
+
+.card h2 {
+    margin-bottom: 10px;
+    color: rgb(37,150,190);
+}
+
+.card p {
+    line-height: 1.5;
+    color: #d1d5db;
+}
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -250px; /* Fully hidden when collapsed */
+    width: 250px;
+    height: 100%;
+    background-color: #1e1e1e; /* Dark background for sidebar */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    transition: transform 0.3s ease-in-out, left 0.3s ease-in-out; /* Smooth transition */
+    z-index: 1000;
+    overflow-y: auto;
+    visibility: hidden; /* Sidebar is not visible */
+}
+
+.sidebar.open {
+    left: 0; /* Sidebar is fully visible */
+    visibility: visible; /* Make it visible when open */
+}
+
+.new-topic-btn {
+    display: block;
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background-color: rgb(37,150,190);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.new-topic-btn:hover {
+    background-color: #3578cc; /* Slightly darker blue on hover */
+}
+
+.topics-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.topic-item {
+    padding: 10px;
+    margin: 5px 0;
+    color: #e2e8f0; /* Light text */
+    background-color: #2a2a2a; /* Slightly lighter background for items */
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.topic-item:hover {
+    background-color: #4a90e2; /* Blue on hover */
+    color: white;
+}
+
+/* Menu Button */
+.menu-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.menu-icon {
+    width: 30px;
+    height: 30px;
+    color: white;
+}
+.profile-icon-link {
+    position: fixed;        /* Keeps the icon fixed in the top right even when scrolling */
+    top: 20px;              /* Adjust top position */
+    right: 20px;            /* Adjust right position */
+    z-index: 1000;          /* Ensures the icon stays above other elements */
+    text-decoration: none;  /* Removes underline */
+}
+
+/* Styling for the Profile Icon */
+.profile-icon {
+    width: 40px;            /* Size of the icon */
+    height: 40px;
+    border-radius: 50%;     /* Makes the icon circular */
+    object-fit: cover;      /* Ensures the image fills the circle */
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional shadow for a nice effect */
+}
     </style>
 </head>
 
 <body>
+    <a href="{% url 'profile' %}" class="profile-icon-link">
+        <img src="{% static 'avatar.png' %}" alt="Profile Icon" class="profile-icon">
+    </a>
+    <button id="menu-btn" class="menu-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="menu-icon">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+    </button>
+    <button id="menu-btn" class="menu-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="menu-icon">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+    </button>
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar">
+        <button class="new-topic-btn">+ New Topic</button>
+        <ul class="topics-list">
+            {% for topic,_ in topics.items %}
+                <li class="topic-item">{{ topic }}</li>
+            {% endfor %}
+        </ul>
+    </div>
     <div id="board"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
     <script>
@@ -44,209 +202,150 @@
     
         class Carousel {
             constructor(element) {
-                this.board = element
-                this.papers = []
-                this.currentIndex = 0
-    
-                // Fetch initial papers
-                this.fetchPapers().then(() => {
-                    // Add first two cards programmatically
-                    this.push()
-                    this.push()
-    
-                    // Handle gestures
-                    this.handle()
-                })
-            }
-    
-            async fetchPapers() {
-                try {
-                    const response = await fetch('/api/get-next-paper/')
-                    const data = await response.json()
-                    if (data.title) {
-                        this.papers.push(data)
-                    }
-                } catch (error) {
-                    console.error('Error fetching paper:', error)
-                }
-            }
-    
-            handle() {
-                // ... (keep the existing handle method as is)
-                // list all cards
-                this.cards = this.board.querySelectorAll('.card')
-    
-                // get top card
-                this.topCard = this.cards[this.cards.length - 1]
-    
-                // get next card
-                this.nextCard = this.cards[this.cards.length - 2]
-    
-                // if at least one card is present
-                if (this.cards.length > 0) {
-    
-                    // set default top card position and scale
-                    this.topCard.style.transform =
-                        'translateX(-50%) translateY(-50%) rotate(0deg) rotateY(0deg) scale(1)'
-    
-                    // destroy previous Hammer instance, if present
-                    if (this.hammer) this.hammer.destroy()
-    
-                    // listen for tap and pan gestures on top card
-                    this.hammer = new Hammer(this.topCard)
-                    this.hammer.add(new Hammer.Tap())
-                    this.hammer.add(new Hammer.Pan({
-                        position: Hammer.position_ALL,
-                        threshold: 0
-                    }))
-    
-                    // pass events data to custom callbacks
-                    this.hammer.on('tap', (e) => {
-                        this.onTap(e)
-                    })
-                    this.hammer.on('pan', (e) => {
-                        this.onPan(e)
-                    })
-    
-                }
-            }
-    
-            onTap(e) {
-                // ... (keep the existing onTap method as is)
-                // get finger position on top card
-                let propX = (e.center.x - e.target.getBoundingClientRect().left) / e.target.clientWidth
-    
-                // get rotation degrees around Y axis (+/- 15) based on finger position
-                let rotateY = 15 * (propX < 0.05 ? -1 : 1)
-    
-                // enable transform transition
-                this.topCard.style.transition = 'transform 100ms ease-out'
-    
-                // apply rotation around Y axis
-                this.topCard.style.transform =
-                    'translateX(-50%) translateY(-50%) rotate(0deg) rotateY(' + rotateY + 'deg) scale(1)'
-    
-                // wait for transition end
-                setTimeout(() => {
-                    // reset transform properties
-                    this.topCard.style.transform =
-                        'translateX(-50%) translateY(-50%) rotate(0deg) rotateY(0deg) scale(1)'
-                }, 100)
-            }
-    
-            onPan(e) {
-        if (!this.isPanning) {
-    
-            this.isPanning = true
-    
-            // remove transition properties
-            this.topCard.style.transition = null
-            if (this.nextCard) this.nextCard.style.transition = null
-    
-            // get top card coordinates in pixels
-            let style = window.getComputedStyle(this.topCard)
-            let mx = style.transform.match(/^matrix\((.+)\)$/)
-            this.startPosX = mx ? parseFloat(mx[1].split(', ')[4]) : 0
-            this.startPosY = mx ? parseFloat(mx[1].split(', ')[5]) : 0
-    
-            // get top card bounds
-            let bounds = this.topCard.getBoundingClientRect()
-    
-            // get finger position on top card, top (1) or bottom (-1)
-            this.isDraggingFrom =
-                (e.center.y - bounds.top) > this.topCard.clientHeight / 2 ? -1 : 1
-    
+        this.board = element
+        this.papers = []
+        this.currentIndex = 0
+
+        // Set board styles programmatically
+        this.board.style.position = 'relative'
+        this.board.style.width = '100%'
+        this.board.style.height = '100vh'
+        this.board.style.display = 'flex'
+        this.board.style.justifyContent = 'center'
+        this.board.style.alignItems = 'center'
+        this.board.style.overflow = 'hidden'
+
+        // Fetch initial papers and setup
+        this.fetchPapers().then(() => {
+            this.push()
+            this.push()
+            this.setupCards()
+        })
+    }
+
+    setupCards() {
+        this.topCard = this.board.querySelector('.card:last-child')
+        if (!this.topCard) return
+
+        // Reset any existing hammer instance
+        if (this.hammertime) {
+            this.hammertime.destroy()
         }
-    
-        // get new coordinates
-        let posX = e.deltaX + this.startPosX
-        let posY = e.deltaY + this.startPosY
-    
-        // get ratio between swiped pixels and the axes
-        let propX = e.deltaX / this.board.clientWidth
-        let propY = e.deltaY / this.board.clientHeight
-    
-        // get swipe direction, left (-1) or right (1)
-        let dirX = e.deltaX < 0 ? -1 : 1
-    
-        // get degrees of rotation, between 0 and +/- 45
-        let deg = this.isDraggingFrom * dirX * Math.abs(propX) * 45
-    
-        // get scale ratio, between .95 and 1
-        let scale = (95 + (5 * Math.abs(propX))) / 100
-    
-        // move and rotate top card
-        this.topCard.style.transform =
-            'translateX(' + posX + 'px) translateY(' + posY + 'px) rotate(' + deg + 'deg) rotateY(0deg) scale(1)'
-    
-        // scale up next card
-        if (this.nextCard) this.nextCard.style.transform =
-            'translateX(-50%) translateY(-50%) rotate(0deg) rotateY(0deg) scale(' + scale + ')'
-    
-        if (e.isFinal) {
-    
-            this.isPanning = false
-    
-            let successful = false
-    
-            // set back transition properties
-            this.topCard.style.transition = 'transform 200ms ease-out'
-            if (this.nextCard) this.nextCard.style.transition = 'transform 100ms linear'
-    
-            // check threshold and movement direction
-            if (propX > 0.25 && e.direction == Hammer.DIRECTION_RIGHT) {
-    
-                successful = true
-                // get right border position
-                posX = this.board.clientWidth
-    
-            } else if (propX < -0.25 && e.direction == Hammer.DIRECTION_LEFT) {
-    
-                successful = trueresearch_interest
-                // get left border position
-                posX = -(this.board.clientWidth + this.topCard.clientWidth)
-    
-            } else if (propY < -0.25 && e.direction == Hammer.DIRECTION_UP) {
-    
-                successful = true
-                // get top border position
-                posY = -(this.board.clientHeight + this.topCard.clientHeight)
-    
-            }
-                if (successful) {
-                    // Determine if it's a like or dislike based on the direction
-                    const rating = (e.direction == Hammer.DIRECTION_RIGHT) ? 'like' : 'dislike'
-    
-                    // Send rating to the backend
-                    this.ratePaper(this.papers[this.currentIndex].title, rating)
-    
-                    // Throw card in the chosen direction
-                    this.topCard.style.transform =
-                        'translateX(' + posX + 'px) translateY(' + posY + 'px) rotate(' + deg + 'deg)'
-    
-                    // Wait for transition end
-                    setTimeout(() => {
-                        // Remove swiped card
+
+        // Center the card initially
+        this.topCard.style.transform = 'translate(-50%, -50%)'
+        this.topCard.style.position = 'absolute'
+        this.topCard.style.left = '50%'
+        this.topCard.style.top = '50%'
+
+        // Initialize hammer on the top card
+        this.hammertime = new Hammer(this.topCard)
+
+        // Track movement state
+        let initialX = 0
+        let initialY = 0
+        let currentX = 0
+        let currentY = 0
+
+        this.hammertime.on('panstart', (e) => {
+            this.topCard.style.transition = 'none'
+            initialX = 0
+            initialY = 0
+            currentX = 0
+            currentY = 0
+        })
+
+        this.hammertime.on('panmove', (e) => {
+            currentX = e.deltaX
+            currentY = e.deltaY
+            const rotation = currentX * 0.1
+            
+            this.topCard.style.transform = 
+                `translate(calc(-50% + ${currentX}px), calc(-50% + ${currentY}px)) rotate(${rotation}deg)`
+        })
+
+        this.hammertime.on('panend', (e) => {
+            this.topCard.style.transition = 'transform 0.3s ease-out'
+
+            const threshold = window.innerWidth * 0.35
+            if (Math.abs(currentX) > threshold) {
+                // Swipe out
+                const direction = currentX > 0 ? 1 : -1
+                const moveOutX = direction * window.innerWidth * 1.5
+                this.topCard.style.transform = 
+                    `translate(calc(-50% + ${moveOutX}px), calc(-50% + ${currentY}px)) rotate(${direction * 30}deg)`
+
+                // Handle rating
+                const rating = direction > 0 ? 'like' : 'dislike'
+                this.ratePaper(this.papers[this.currentIndex].title, rating)
+
+                // Remove card and add new one
+                setTimeout(() => {
+                    if (this.topCard.parentElement) {
                         this.board.removeChild(this.topCard)
-                        // Move to next paper
                         this.currentIndex++
-                        // Add new card
                         this.push()
-                        // Handle gestures on new top card
-                        this.handle()
-                    }, 200)
-                } else {
-    
-                    // reset cards position and size
-                    this.topCard.style.transform =
-                        'translateX(-50%) translateY(-50%) rotate(0deg) rotateY(0deg) scale(1)'
-                    if (this.nextCard) this.nextCard.style.transform =
-                        'translateX(-50%) translateY(-50%) rotate(0deg) rotateY(0deg) scale(0.95)'
-    
-                }
+                        this.setupCards()
+                    }
+                }, 300)
+            } else {
+                // Return to center
+                this.topCard.style.transform = 'translate(-50%, -50%) rotate(0deg)'
             }
-    
+        })
+    }
+
+    push() {
+        if (this.currentIndex >= this.papers.length - 1) {
+            this.fetchPapers()
+        }
+
+        const paper = this.papers[this.currentIndex]
+        if (!paper) return
+
+        let card = document.createElement('div')
+        card.classList.add('card')
+        
+        // Set initial card styles
+        card.style.position = 'absolute'
+        card.style.left = '50%'
+        card.style.top = '50%'
+        card.style.transform = 'translate(-50%, -50%)'
+        card.style.width = '300px'
+        card.style.height = '400px'
+        card.style.backgroundColor = 'white'
+        card.style.borderRadius = '10px'
+        card.style.boxShadow = '0 4px 15px rgba(0,0,0,0.1)'
+        card.style.padding = '20px'
+        card.style.cursor = 'grab'
+        card.style.userSelect = 'none'
+        card.style.touchAction = 'none'
+
+        let title = document.createElement('h2')
+        title.textContent = paper.title
+        title.style.marginBottom = '15px'
+        card.appendChild(title)
+
+        let content = document.createElement('p')
+        // content.textContent = paper.content.substring(0, 1500) + '...'
+        content.textContent=paper.content
+        content.style.lineHeight = '1.5'
+        card.appendChild(content)
+
+        this.board.insertBefore(card, this.board.firstChild)
+    }
+
+    async fetchPapers() {
+        try {
+            const response = await fetch('/api/get-next-paper/')
+            const data = await response.json()
+            if (data.title) {
+                this.papers.push(data)
             }
+        } catch (error) {
+            console.error('Error fetching paper:', error)
+        }
+    }
     
             async ratePaper(papertitle, rating) {
                 try {
@@ -283,30 +382,56 @@
             }
     
             push() {
-                if (this.currentIndex >= this.papers.length - 1) {
-                    this.fetchPapers()
-                }
-    
-                const paper = this.papers[this.currentIndex]
-                if (!paper) return
-    
-                let card = document.createElement('div')
-                card.classList.add('card')
-    
-                let title = document.createElement('h2')
-                title.textContent = paper.title
-                card.appendChild(title)
-    
-                let content = document.createElement('p')
-                content.textContent = paper.content.substring(0, 200) + '...' // Display first 200 characters
-                card.appendChild(content)
-    
-                this.board.insertBefore(card, this.board.firstChild)
-            }
+        if (this.currentIndex >= this.papers.length - 1) {
+            this.fetchPapers()
+        }
+
+        const paper = this.papers[this.currentIndex]
+        if (!paper) return
+
+        let card = document.createElement('div')
+        card.classList.add('card')
+
+        let title = document.createElement('h2')
+        title.textContent = paper.title
+        card.appendChild(title)
+
+        let content = document.createElement('p')
+         content.textContent = paper.content.substring(0, 1100) + '...'
+        // content.textContent=paper.content
+        card.appendChild(content)
+
+        this.board.insertBefore(card, this.board.firstChild)
+    }
         }
     
-        let board = document.querySelector('#board')
-        let carousel = new Carousel(board)
+        document.addEventListener('DOMContentLoaded', function() {
+    const board = document.querySelector('#board')
+    const carousel = new Carousel(board)
+    const menuBtn = document.getElementById('menu-btn');
+    const sidebar = document.getElementById('sidebar');
+
+    // Toggle sidebar open/close
+    menuBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent the click from bubbling up
+        if (sidebar.classList.contains('open')) {
+            sidebar.classList.remove('open');
+            sidebar.style.visibility = 'hidden'; // Completely hide when collapsed
+        } else {
+            sidebar.classList.add('open');
+            sidebar.style.visibility = 'visible'; // Show when expanded
+        }
+    });
+
+    // Close sidebar when clicking outside of it
+    document.addEventListener('click', (e) => {
+        if (!sidebar.contains(e.target) && e.target !== menuBtn) {
+            sidebar.classList.remove('open');
+            sidebar.style.visibility = 'hidden'; // Completely hide when collapsed
+        }
+    });
+});
+
     </script>
 </body>
 

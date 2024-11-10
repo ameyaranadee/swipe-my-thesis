@@ -36,10 +36,10 @@ class UserPreference(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     reading_time = models.IntegerField(choices=[(i, f"{i} minutes") for i in range(15, 121, 15)])
     difficulty_level = models.CharField(max_length=20)
-    paper_recency = models.CharField(max_length=20)
+    paper_recency = models.IntegerField()
     research_interest = models.ForeignKey(ResearchInterest, on_delete=models.SET_NULL, null=True, blank=True)
 
-    def __str__(self):
+    def _str_(self):
         return f"Preferences of {self.user.username}"
 
 class UserLikedPapers(models.Model):

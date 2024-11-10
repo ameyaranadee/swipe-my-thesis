@@ -4,6 +4,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from django.templatetags.static import static
 from .forms import CustomUserCreationForm
 from .models import UserPreference, ResearchInterest
 from django.contrib.auth.models import User
@@ -14,6 +16,8 @@ import random
 import threading
 from app.recommend import load_model, search_arxiv_and_parse, call_main_function
 from app.summarize import call_summarize_main_function
+from django.urls import reverse
+import os
 
 
 
@@ -114,11 +118,9 @@ def submit_preferences(request):
     return redirect('landing_page')
 
 def start_swiping(request):
-    # Capture the preferences and save them to the database
-    
-    reading_time = request.POST.get('reading_time')
+    reading_time = int(request.POST.get('reading_time'))
     difficulty_level = request.POST.get('difficulty_level')
-    paper_recency = request.POST.get('paper_recency')
+    paper_recency = int(request.POST.get('paper_recency'))
     research_interest_name = request.POST.get('research_interest')
 
     research_interest, created = ResearchInterest.objects.get_or_create(name=research_interest_name)
@@ -131,22 +133,25 @@ def start_swiping(request):
         research_interest=research_interest
     )
 
-    return redirect('paper_swipe') 
+    call_main_function.delay(research_interest_name, reading_time, paper_recency, difficulty_level)
+
+    return render(request, 'loading.html')
+
+def loading_page(request):
+    return render(request, 'loading.html')
 
 def swipe_papers(request):
     return render(request, "swipe_papers.html")
 
 def paper_swipe_view(request):
-    reading_time = request.GET.get('reading_time')
-    difficulty_level = request.GET.get('difficulty_level')
-    paper_recency = request.GET.get('paper_recency')
-    research_interest = request.GET.get('research_interest')
-
-    if difficulty_level == 'Undergradaute': diff_lv = 'Basic' 
-    else: diff_lv = 'Advanced'
-
-    call_main_function.delay(query=research_interest, target_reading=reading_time, diff_lv=diff_lv)
-    return render(request, 'paper_swipe.html')
+# liked_papers = UserLikedPapers.objects.filter(user=request.user).select_related('paper')
+    # topics = [n]
+    # for liked_paper in liked_papers:
+    #     paper = liked_paper.paper
+    #     if paper.research_interest and paper.research_interest.name not in topics:
+    #         topics.append(paper.research_interest.name)
+    # print("Topics are :", topics)
+    return render(request, 'paper_swipe.html', {'topics': ['NLP', 'ML']})
 
 def get_next_paper(request):
     # Get a random paper
@@ -184,48 +189,65 @@ def rate_paper(request):
     
     return JsonResponse({'status': 'success'})
 
-def start_swiping(request):
-    reading_time = request.POST.get('reading_time')
-    difficulty_level = request.POST.get('difficulty_level')
-    paper_recency = request.POST.get('paper_recency')
-    research_interest_name = request.POST.get('research_interest')
-
-    research_interest, created = ResearchInterest.objects.get_or_create(name=research_interest_name)
-
-    user_preference = UserPreference.objects.get_or_create(
-        user=request.user,
-        reading_time=reading_time,
-        difficulty_level=difficulty_level,
-        paper_recency=paper_recency,
-        research_interest=research_interest
-    )
-
-    url = reverse('paper_swipe')
-    query_string = f"?reading_time={reading_time}&difficulty_level={difficulty_level}&paper_recency={paper_recency}&research_interest={research_interest_name}"
-    full_url = f"{url}{query_string}"
-
-    return redirect(full_url)
-
 def profile_view(request):
-    user=request.user
+    user = request.user
     topics_with_papers = {}
-    if user:
-        liked_papers = UserLikedPapers.objects.filter(user=user).select_related('paper')
+    user_details = {}
 
-        # Group papers by research_interest
+    if user.is_authenticated:
+        user_profile = UserProfile.objects.get(user=user)
+        user_details = {
+                    "name": user.get_full_name() or user.username,  # Fallback to username if full name is not available
+                    "email": user.email,
+                    "profile_picture": user_profile.profile_picture.url if user_profile.profile_picture else None,
+                    "university": user_profile.university,
+                    "major": user_profile.major,
+                    "courses": user_profile.courses.split(","),  # Split courses into a list
+                    "research_interests": [interest.name for interest in user_profile.research_interests.all()]
+            }
+        liked_papers = UserLikedPapers.objects.filter(user=user).select_related('paper')
         for liked_paper in liked_papers:
             paper = liked_paper.paper
             if paper.research_interest:
-                # Initialize the list if the key doesn't exist
                 if paper.research_interest.name not in topics_with_papers:
                     topics_with_papers[paper.research_interest.name] = []
                 
                 topics_with_papers[paper.research_interest.name].append({
                     "title": paper.title,
                     "description": paper.abstract,
-                    "link": paper.url,
+                    "link": paper.url
                 })
 
         print("Topics are ", topics_with_papers)
 
-    return render(request, 'profile.html', {'topics_with_papers': topics_with_papers})
+    return render(request, 'profile.html', {'topics_with_papers': topics_with_papers, 'user_details': user_details})
+
+def partner_view(request):
+    profile_pics_path = os.path.join(settings.BASE_DIR, 'profile_pics')
+    print("path ", profile_pics_path)
+    profile_pics = os.listdir(profile_pics_path)
+    partner_data = [
+        {
+            "name": "Alice Johnson",
+            "email": "alice.johnson@example.com",
+            "university": "Umass Amherst",
+            "major": "Artificial Intelligence",
+            "profile_picture": static("app/avatar.png")
+        },
+        # {
+        #     "name": "Bob Smith",
+        #     "email": "bob.smith@example.com",
+        #     "university": "Umass Amherst",
+        #     "major": "Data Science",
+        #     "profile_picture": static("app/avatar2.png")
+        # },
+        # {
+        #     "name": "Carol Lee",
+        #     "email": "carol.lee@example.com",
+        #     "university": "Umass Amherst",
+        #     "major": "Machine Learning",
+        #     "profile_picture": static("app/avatar3.png")
+        # },
+    ]
+
+    return render(request, 'partner.html', {'partners': partner_data})
