@@ -6,7 +6,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from .forms import CustomUserCreationForm
 from django.views.decorators.http import require_POST
-from .models import UserProfile, ResearchInterest, UserLikedPapers, UserPreference
+from .models import UserProfile, ResearchInterest, UserLikedPapers, UserPreference, Paper
 from django.contrib.auth.models import User
 import random
 
@@ -140,7 +140,6 @@ def get_next_paper(request):
     print(papers)
     if papers:
         paper = random.choice(papers)
-
         return JsonResponse({
             'title': paper.title,
             'content': paper.abstract
