@@ -1,3 +1,4 @@
+from collections import defaultdict
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
@@ -165,3 +166,27 @@ def rate_paper(request):
     
     return JsonResponse({'status': 'success'})
 
+
+def profile_view(request):
+    user=request.user
+    topics_with_papers = {}
+    if user:
+        liked_papers = UserLikedPapers.objects.filter(user=user).select_related('paper')
+
+        # Group papers by research_interest
+        for liked_paper in liked_papers:
+            paper = liked_paper.paper
+            if paper.research_interest:
+                # Initialize the list if the key doesn't exist
+                if paper.research_interest.name not in topics_with_papers:
+                    topics_with_papers[paper.research_interest.name] = []
+                
+                topics_with_papers[paper.research_interest.name].append({
+                    "title": paper.title,
+                    "description": paper.abstract,
+                    "link": paper.url,
+                })
+
+        print("Topics are ", topics_with_papers)
+
+    return render(request, 'profile.html', {'topics_with_papers': topics_with_papers})

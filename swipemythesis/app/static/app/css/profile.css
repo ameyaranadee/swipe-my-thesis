@@ -1,0 +1,160 @@
+:root {
+    --blue: rgba(37, 150, 190, 1);
+    --blue-light: rgba(37, 150, 190, 0.2);
+    --text-color: #333;
+    --background-color: #f9f9f9;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.profile-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1 {
+    color: var(--blue);
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.profile-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.profile-pic img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px solid var(--blue);
+}
+
+.profile-details p {
+    margin: 5px 0;
+}
+
+/* Interests Section */
+.interests {
+    margin-top: 20px;
+}
+
+.interests label {
+    font-weight: bold;
+    color: var(--blue);
+    font-size: 18px;
+}
+
+.tags {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.tag {
+    padding: 8px 12px;
+    background-color: var(--blue-light);
+    color: rgba(37, 150, 190, 0.9);
+    border-radius: 15px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Topics List Section */
+.topics-list {
+    margin-top: 20px;
+}
+
+.topic-card {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px var(--shadow-color);
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.topic-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px var(--shadow-color);
+}
+
+.topic-card h3 {
+    font-size: 20px;
+    color: var(--blue);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.icon-arrow {
+    margin-left: auto;
+}
+
+.arrow-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--blue);
+    transition: transform 0.3s;
+}
+
+.arrow-icon.rotated {
+    transform: rotate(180deg);
+}
+
+.papers-list {
+    margin-top: 10px;
+    padding-left: 10px;
+}
+
+.paper-divider {
+    border: none;
+    border-top: 1px solid var(--blue-light);
+    margin: 10px 0;
+}
+.paper-item {
+    margin-bottom: 15px; /* Add spacing between items */
+}
+
+.paper-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 5px; /* Space between title and description */
+}
+
+.paper-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--text-color);
+    margin: 0;
+}
+
+/* .paper-icons {
+    gap: 10px;
+    font-size: 16px;
+} */
+
+.icon {
+    width: 24px;
+    height: 24px;
+    color: var(--blue);
+}
+
+.paper-icons{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
